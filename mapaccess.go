@@ -7,13 +7,13 @@ import (
 )
 
 // Get returns the corresponding key from the map
-func Get(key string, data interface{}) (interface{}, error) {
+func Get(data interface{}, key string) (interface{}, error) {
 	var err error
 	state := data
 	parser := parse(key)
 	token := parser.nextItem()
 	for token.typ != tokenEnd && token.typ != tokenError {
-		if state, err = get(token, state); err != nil {
+		if state, err = get(state, token); err != nil {
 			return nil, err
 		}
 		token = parser.nextItem()
@@ -24,7 +24,7 @@ func Get(key string, data interface{}) (interface{}, error) {
 	return state, nil
 }
 
-func get(key token, data interface{}) (interface{}, error) {
+func get(data interface{}, key token) (interface{}, error) {
 	switch state := data.(type) {
 	case map[string]interface{}:
 		switch key.typ {

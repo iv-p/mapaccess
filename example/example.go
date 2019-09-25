@@ -29,12 +29,12 @@ func main() {
 		panic(err)
 	}
 
-	bestFriendName, err := mapaccess.Get("friends[0].name", deserialised)
+	bestFriendName, err := mapaccess.Get(deserialised, "friends[0].name")
 	if err != nil {
 		panic(err)
 	}
 
-	myName, err := mapaccess.Get("name", deserialised)
+	myName, err := mapaccess.Get(deserialised, "name")
 	if err != nil {
 		panic(err)
 	}
