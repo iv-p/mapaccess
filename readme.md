@@ -11,6 +11,10 @@ To install mapaccess just run the following command in your terminal
 go get -u github.com/iv-p/mapaccess
 ```
 
+## Ideology
+
+The library consists of three different components - lexer, parser and interpreter. They work concurrently, making mapaccess very fast.
+
 ## Usage
 
 mapaccess exposes only one function, which takes a string key and a interface{}:
