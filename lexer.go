@@ -12,18 +12,6 @@ type item struct {
 	val string   // The key value of this item.
 }
 
-func (i item) String() string {
-	switch {
-	case i.typ == itemEOF:
-		return "EOF"
-	case i.typ == itemError:
-		return i.val
-	case i.typ > itemIdentifier:
-		return fmt.Sprintf("<%s>", i.val)
-	}
-	return fmt.Sprintf("%q", i.val)
-}
-
 // itemType identifies the type of lex items.
 type itemType int
 
@@ -79,11 +67,6 @@ func (l *lexer) emit(t itemType) {
 	l.start = l.pos
 }
 
-// ignore skips over the pending input before this point.
-func (l *lexer) ignore() {
-	l.start = l.pos
-}
-
 // accept consumes the next rune if it's from the valid set.
 func (l *lexer) accept(valid string) bool {
 	if strings.ContainsRune(valid, l.next()) {
@@ -111,13 +94,6 @@ func (l *lexer) errorf(format string, args ...interface{}) lexStateFn {
 // Called by the parser, not in the lexing goroutine.
 func (l *lexer) nextItem() item {
 	return <-l.items
-}
-
-// drain drains the output so the lexing goroutine will exit.
-// Called by the parser, not in the lexing goroutine.
-func (l *lexer) drain() {
-	for range l.items {
-	}
 }
 
 // lex creates a new scanner for the input string.
