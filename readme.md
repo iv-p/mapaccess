@@ -2,6 +2,8 @@
 
 A small golang library to retrieve arbitrary keys from golang interface{}. Think of it as acessing JSON keys from arbitrary interfaces{}. It is heavily influenced by the golang temlpate engine.
 
+![badge](https://action-badges.now.sh/iv-p/mapaccess?action=test)
+
 ## Installation
 
 To install mapaccess just run the following command in your terminal
