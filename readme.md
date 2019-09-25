@@ -1,6 +1,6 @@
 # mapaccess
 
-A small golang library to retrieve arbitrary keys from golang interface{}. Think of it as acessing JSON keys from arbitrary interfaces{}. It is heavily influenced by the golang temlpate engine.
+A small golang library to retrieve arbitrary keys from golang interface{}. Think of it as acessing JSON keys from arbitrary object. It is heavily influenced by the golang temlpate engine.
 
 ![](https://github.com/iv-p/mapaccess/workflows/test/badge.svg)
 
