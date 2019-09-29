@@ -108,10 +108,20 @@ func lex(input string) *lexer {
 
 // run runs the state machine for the lexer.
 func (l *lexer) run() {
-	for state := lexIdentifier; state != nil; {
+	for state := lexStart; state != nil; {
 		state = state(l)
 	}
 	close(l.items)
+}
+
+func lexStart(l *lexer) lexStateFn {
+	next := l.peek()
+	switch next {
+	case '[':
+		return lexArrayIndexAction
+	default:
+		return lexIdentifier
+	}
 }
 
 // lexIdentifier scans an alphanumeric.
@@ -152,7 +162,13 @@ func lexDotAction(l *lexer) lexStateFn {
 	switch r {
 	case '.':
 		l.emit(itemDot)
-		return lexIdentifier
+		next := l.peek()
+		switch next {
+		case '[':
+			return lexArrayIndexAction
+		default:
+			return lexIdentifier
+		}
 	default:
 		return l.errorf("bad character")
 	}
@@ -173,9 +189,12 @@ func lexArrayIndexAction(l *lexer) lexStateFn {
 		return l.errorf("missing closing bracket ] at array index <[]>")
 	}
 	l.emit(itemArrayIndex)
-	switch r := l.peek(); {
-	case r == '.':
+	next := l.peek()
+	switch next {
+	case '.':
 		return lexDotAction
+	case '[':
+		return lexArrayIndexAction
 	default:
 		return lexEOF
 	}

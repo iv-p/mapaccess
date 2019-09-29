@@ -38,13 +38,6 @@ func parse(input string) *parser {
 	return p
 }
 
-func (p *parser) run() {
-	for state := parseIdentifier; state != nil; {
-		state = state(p)
-	}
-	close(p.tokens)
-}
-
 // errorf returns an error token and terminates the scan by passing
 // back a nil pointer that will be the next state.
 func (p *parser) errorf(format string, args ...interface{}) parseStateFn {
@@ -62,15 +55,48 @@ func (p *parser) nextItem() token {
 	return <-p.tokens
 }
 
+func (p *parser) run() {
+	for state := parseStart; state != nil; {
+		state = state(p)
+	}
+	close(p.tokens)
+}
+
+func (p *parser) getBufOrNext() item {
+	if p.buf != nil {
+		item := *p.buf
+		p.buf = nil
+		return item
+	}
+	return p.lex.nextItem()
+}
+
+// parseStart scans for either an identifier, or an array index
+func parseStart(p *parser) parseStateFn {
+	item := p.getBufOrNext()
+	p.buf = &item
+	switch item.typ {
+	case itemArrayIndex:
+		return parseArrayIndex
+	case itemIdentifier:
+		return parseIdentifier
+	case itemEOF:
+		p.emit(token{tokenEnd, ""})
+		return nil
+	default:
+		return p.errorf("expected array index or identifier")
+	}
+}
+
 // parseIdentifier scans for identifiers
 func parseIdentifier(p *parser) parseStateFn {
-	item := p.lex.nextItem()
+	item := p.getBufOrNext()
 	if item.typ == itemIdentifier {
 		// we already did rune checking in the lexer, good to go
 		p.emit(token{tokenIdentifier, item.val})
-		i := p.lex.nextItem()
-		p.buf = &i
-		switch i.typ {
+		next := p.lex.nextItem()
+		p.buf = &next
+		switch next.typ {
 		case itemDot:
 			return parseDot
 		case itemArrayIndex:
@@ -93,13 +119,7 @@ func parseIdentifier(p *parser) parseStateFn {
 
 // parseDot scans for dots
 func parseDot(p *parser) parseStateFn {
-	var item item
-	if p.buf != nil {
-		item = *p.buf
-		p.buf = nil
-	} else {
-		item = p.lex.nextItem()
-	}
+	item := p.getBufOrNext()
 	if item.typ != itemDot {
 		return p.errorf("expected dot")
 	}
@@ -109,13 +129,7 @@ func parseDot(p *parser) parseStateFn {
 
 // parseArrayIndex scans for dots
 func parseArrayIndex(p *parser) parseStateFn {
-	var item item
-	if p.buf != nil {
-		item = *p.buf
-		p.buf = nil
-	} else {
-		item = p.lex.nextItem()
-	}
+	item := p.getBufOrNext()
 	if item.typ != itemArrayIndex {
 		return p.errorf("expected array index")
 	}
@@ -130,10 +144,12 @@ func parseArrayIndex(p *parser) parseStateFn {
 	switch p.buf.typ {
 	case itemDot:
 		return parseDot
+	case itemArrayIndex:
+		return parseArrayIndex
 	case itemEOF:
 		p.emit(token{tokenEnd, ""})
 		return nil
 	default:
-		return p.errorf("expected dot or eof after array index")
+		return p.errorf("expected dot or array index after array index")
 	}
 }
