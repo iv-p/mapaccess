@@ -1,9 +1,28 @@
 package mapaccess
 
 import (
+	"fmt"
+	"html/template"
+	"io/ioutil"
 	"reflect"
 	"testing"
 )
+
+type Data struct {
+	Array  []string
+	Nested Nested
+}
+
+type Nested struct {
+	Array []string
+}
+
+var typed = Data{
+	Array: []string{"value"},
+	Nested: Nested{
+		Array: []string{"four"},
+	},
+}
 
 var data = map[string]interface{}{
 	"array": []interface{}{"value"},
@@ -48,4 +67,29 @@ func TestGet(t *testing.T) {
 			}
 		})
 	}
+}
+
+func benchmarkMapaccess(key string, b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		Get(data, key)
+	}
+}
+
+func benchmarkGoTemplate(key string, b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		t, err := template.New("tmpl").Parse(key)
+		if err != nil {
+			fmt.Println(err)
+		}
+		t.Execute(ioutil.Discard, typed)
+	}
+}
+
+func BenchmarkMapaccessRootKey(b *testing.B)     { benchmarkMapaccess("nested", b) }
+func BenchmarkMapaccessNestedKey(b *testing.B)   { benchmarkMapaccess("nested.array", b) }
+func BenchmarkMapaccessNestedArray(b *testing.B) { benchmarkMapaccess("nested.array[0]", b) }
+func BenchmarkGoTemplateRootKey(b *testing.B)    { benchmarkGoTemplate("{{ .Nested }}", b) }
+func BenchmarkGoTemplateNestedKey(b *testing.B)  { benchmarkGoTemplate("{{ .Nested.Array }}", b) }
+func BenchmarkGoTemplateNestedArray(b *testing.B) {
+	benchmarkGoTemplate("{{ index .Nested.Array 0 }}", b)
 }
