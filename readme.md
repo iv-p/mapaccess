@@ -15,7 +15,7 @@ go get -u github.com/iv-p/mapaccess
 
 The library consists of three different components - lexer, parser and interpreter. They work concurrently, making mapaccess very fast.
 
-## Usage
+## Example
 
 mapaccess exposes only one function, which takes a string key and a interface{}:
 ```go
@@ -63,6 +63,30 @@ log.Printf("My name is %s and my best friend's name is %s",
 Running the above snippet produces the following output
 ```
 My name is John Doe and my best friend's name is Jaime Mckinney
+```
+
+## Syntax
+### Keys
+A key can be accessed either as the root, or as a nested field. If after a nested field, it's required it's after a `.`
+```go
+// Valid
+mapaccess.Get(data, "friends")
+mapaccess.Get(data, "friends.name")
+mapaccess.Get(data, "friends[0].name")
+// Invalid
+mapaccess.Get(data, "friends[0]name")
+```
+### Array indexes
+An array index can be accessed the same as a regular key, either at the root level, or at a deeper level. The only difference is that nested array indexes need to be consecutive `key[0][1]` and can't be separated by a `.`. At root level, no `key` identifier is expected before the array index, however if it's nested a `key` identifier is always required.
+```go
+// Valid
+mapaccess.Get(data, "[0]")
+mapaccess.Get(data, "friends[0]")
+mapaccess.Get(data, "friends[0][1]")
+mapaccess.Get(data, "friends[0][1].name")
+// Invalid
+mapaccess.Get(data, "[0].[1]")
+mapaccess.Get(data, "friends[0].[1]")
 ```
 
 ## Valid keys
