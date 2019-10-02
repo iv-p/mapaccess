@@ -22,19 +22,19 @@ var (
 )
 
 var parseTests = []parseTest{
-	// {"", []token{tEnd}},
-	// {"somekey", []token{mkToken(tokenIdentifier, "somekey"), tEnd}},
-	// {"some6key9", []token{mkToken(tokenIdentifier, "some6key9"), tEnd}},
-	// {"keyone.keytwo", []token{mkToken(tokenIdentifier, "keyone"), mkToken(tokenIdentifier, "keytwo"), tEnd}},
-	// {"keyone[0]", []token{mkToken(tokenIdentifier, "keyone"), mkToken(tokenArrayIndex, "0"), tEnd}},
-	// {"keyone.keytwo[0]", []token{mkToken(tokenIdentifier, "keyone"), mkToken(tokenIdentifier, "keytwo"), mkToken(tokenArrayIndex, "0"), tEnd}},
-	// {"keyone[9].keytwo[0]", []token{mkToken(tokenIdentifier, "keyone"), mkToken(tokenArrayIndex, "9"), mkToken(tokenIdentifier, "keytwo"), mkToken(tokenArrayIndex, "0"), tEnd}},
+	{"", []token{tEnd}},
+	{"somekey", []token{mkToken(tokenIdentifier, "somekey"), tEnd}},
+	{"some6key9", []token{mkToken(tokenIdentifier, "some6key9"), tEnd}},
+	{"keyone.keytwo", []token{mkToken(tokenIdentifier, "keyone"), mkToken(tokenIdentifier, "keytwo"), tEnd}},
+	{"keyone[0]", []token{mkToken(tokenIdentifier, "keyone"), mkToken(tokenArrayIndex, "0"), tEnd}},
+	{"keyone.keytwo[0]", []token{mkToken(tokenIdentifier, "keyone"), mkToken(tokenIdentifier, "keytwo"), mkToken(tokenArrayIndex, "0"), tEnd}},
+	{"keyone[9].keytwo[0]", []token{mkToken(tokenIdentifier, "keyone"), mkToken(tokenArrayIndex, "9"), mkToken(tokenIdentifier, "keytwo"), mkToken(tokenArrayIndex, "0"), tEnd}},
 	{"[0].test", []token{mkToken(tokenArrayIndex, "0"), mkToken(tokenIdentifier, "test"), tEnd}},
-	// {"keyo..", []token{mkToken(tokenIdentifier, "keyo"), tError}},
-	// {"keyo.[0].test", []token{mkToken(tokenIdentifier, "keyo"), tError}},
-	// {" somekey", []token{tError}},
-	// {"somekey ", []token{mkToken(tokenIdentifier, "somekey"), tError}},
-	// {"somekey.", []token{mkToken(tokenIdentifier, "somekey"), tEnd}},
+	{"keyo..", []token{mkToken(tokenIdentifier, "keyo"), tError}},
+	{"keyo.[0].test", []token{mkToken(tokenIdentifier, "keyo"), tError}},
+	{" somekey", []token{tError}},
+	{"somekey ", []token{mkToken(tokenIdentifier, "somekey"), tError}},
+	{"somekey.", []token{mkToken(tokenIdentifier, "somekey"), tEnd}},
 }
 
 // collect gathers the emitted items into a slice.
