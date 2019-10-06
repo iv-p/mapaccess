@@ -41,8 +41,8 @@ var lexTests = []lexTest{
 	{"error", "somekey.", []item{mkItem(itemIdentifier, "somekey"), iDot, iEOF}},
 }
 
-// collect gathers the emitted items into a slice.
-func collect(t *lexTest) (items []item) {
+// collectItems gathers the emitted items into a slice.
+func collectItems(t *lexTest) (items []item) {
 	l := lex(t.input)
 	for {
 		item := l.nextItem()
@@ -54,7 +54,7 @@ func collect(t *lexTest) (items []item) {
 	return
 }
 
-func equal(i1, i2 []item, checkPos bool) bool {
+func itemEqual(i1, i2 []item, checkPos bool) bool {
 	if len(i1) != len(i2) {
 		return false
 	}
@@ -71,8 +71,8 @@ func equal(i1, i2 []item, checkPos bool) bool {
 
 func TestLex(t *testing.T) {
 	for _, test := range lexTests {
-		items := collect(&test)
-		if !equal(items, test.items, false) {
+		items := collectItems(&test)
+		if !itemEqual(items, test.items, false) {
 			t.Errorf("%s: got\n\t%+v\nexpected\n\t%v", test.name, items, test.items)
 		}
 	}

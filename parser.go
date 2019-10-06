@@ -56,10 +56,10 @@ func (p *parser) nextItem() token {
 }
 
 func (p *parser) run() {
+	defer close(p.tokens)
 	for state := parseStart; state != nil; {
 		state = state(p)
 	}
-	close(p.tokens)
 }
 
 func (p *parser) getBufOrNext() item {

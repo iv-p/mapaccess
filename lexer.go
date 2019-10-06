@@ -108,10 +108,10 @@ func lex(input string) *lexer {
 
 // run runs the state machine for the lexer.
 func (l *lexer) run() {
+	defer close(l.items)
 	for state := lexStart; state != nil; {
 		state = state(l)
 	}
-	close(l.items)
 }
 
 func lexStart(l *lexer) lexStateFn {
@@ -207,11 +207,6 @@ func lexEOF(l *lexer) lexStateFn {
 		return nil
 	}
 	return lexIdentifier
-}
-
-// isSpace reports whether r is a space character.
-func isSpace(r rune) bool {
-	return r == ' ' || r == '\t'
 }
 
 // isAlphaNumeric reports whether r is an alphabetic, digit, or underscore.

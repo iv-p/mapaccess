@@ -37,8 +37,8 @@ var parseTests = []parseTest{
 	{"somekey.", []token{mkToken(tokenIdentifier, "somekey"), tEnd}},
 }
 
-// collect gathers the emitted items into a slice.
-func pcollect(t *parseTest) (tokens []token) {
+// collectTokens gathers the emitted items into a slice.
+func collectTokens(t *parseTest) (tokens []token) {
 	p := parse(t.input)
 	for {
 		token := p.nextItem()
@@ -50,7 +50,7 @@ func pcollect(t *parseTest) (tokens []token) {
 	return
 }
 
-func pequal(i1, i2 []token) bool {
+func tokenEqual(i1, i2 []token) bool {
 	if len(i1) != len(i2) {
 		return false
 	}
@@ -67,8 +67,8 @@ func pequal(i1, i2 []token) bool {
 
 func TestParse(t *testing.T) {
 	for _, test := range parseTests {
-		tokens := pcollect(&test)
-		if !pequal(tokens, test.tokens) {
+		tokens := collectTokens(&test)
+		if !tokenEqual(tokens, test.tokens) {
 			t.Errorf("got\n\t%+v\nexpected\n\t%v", tokens, test.tokens)
 		}
 	}
