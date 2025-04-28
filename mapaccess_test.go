@@ -3,7 +3,7 @@ package mapaccess
 import (
 	"fmt"
 	"html/template"
-	"io/ioutil"
+	"io"
 	"reflect"
 	"testing"
 )
@@ -69,6 +69,68 @@ func TestGet(t *testing.T) {
 	}
 }
 
+func TestGetAs(t *testing.T) {
+	type args struct {
+		key  string
+		data interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{"root", args{"one", data}, "two", false},
+		{"root array", args{"array[0]", data}, "value", false},
+		{"nested", args{"nested.key", data}, "three", false},
+		{"nested array", args{"nested.array[0]", data}, "four", false},
+
+		{"spaces", args{" one.two[0]", data}, "", true},
+		{"spaces", args{"o.test.", data}, "", true},
+		{"spaces", args{"[0]", data}, "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetAs[string](tt.args.data, tt.args.key)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Get() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetAsInt(t *testing.T) {
+	m := map[string]interface{}{
+		"one":   1,
+		"two":   2.2,
+		"three": 0.3,
+	}
+
+	if val, err := GetAs[int](m, "one"); err != nil {
+		t.Errorf("GetAs() error = %v", err)
+
+	} else if val != 1 {
+		t.Errorf("GetAs() = %v, want %v", val, 1)
+	}
+
+	if val, err := GetAs[float64](m, "two"); err != nil {
+		t.Errorf("GetAs() error = %v", err)
+	} else if val != 2.2 {
+		t.Errorf("GetAs() = %v, want %v", val, 2.2)
+	}
+
+	if val, err := GetAs[float64](m, "three"); err != nil {
+		t.Errorf("GetAs() error = %v", err)
+	} else if val != 0.3 {
+		t.Errorf("GetAs() = %v, want %v", val, 0.3)
+	}
+
+}
+
 func benchmarkMapaccess(key string, b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		Get(data, key)
@@ -81,7 +143,7 @@ func benchmarkGoTemplate(key string, b *testing.B) {
 		if err != nil {
 			fmt.Println(err)
 		}
-		t.Execute(ioutil.Discard, typed)
+		t.Execute(io.Discard, typed)
 	}
 }
 

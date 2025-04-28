@@ -24,6 +24,21 @@ func Get(data interface{}, key string) (interface{}, error) {
 	return state, nil
 }
 
+// GetAs returns the corresponding key from the map and converts it to type T
+func GetAs[T any](data interface{}, key string) (T, error) {
+	if val, err := Get(data, key); err != nil {
+		var zero T
+		return zero, err
+
+	} else {
+		if res, ok := val.(T); ok {
+			return res, nil
+		}
+		var zero T
+		return zero, fmt.Errorf("expected type %s but got %s", reflect.TypeOf(zero), reflect.TypeOf(val))
+	}
+}
+
 func get(data interface{}, key token) (interface{}, error) {
 	switch state := data.(type) {
 	case map[string]interface{}:

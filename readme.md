@@ -28,9 +28,11 @@ It is intended towards using with serializing arbitary JSON and getting an arbit
 j := []byte(`{
     "id": "9b92b11b-b57f-4fa6-af5e-e35a290dc764",	
     "name": "John Doe",
+    "age": 44,
     "friends": [
         {
-            "name": "Jaime Mckinney"
+            "name": "Jaime Mckinney",
+            "age": 41
         },
         {
             "name": "Evangeline Alvarado"
@@ -87,6 +89,17 @@ mapaccess.Get(data, "friends[0][1].name")
 // Invalid
 mapaccess.Get(data, "[0].[1]")
 mapaccess.Get(data, "friends[0].[1]")
+```
+
+### Generic GetAs[T any] Method
+The `GetAs[T any]` method allows you too simplify accessing maps by casting the extraced value to a concrete type
+```go
+// Valid
+mapaccess.GetAs[string](data, "id")
+mapaccess.GetAs[string](data, "name")
+mapaccess.GetAs[int](data, "age")
+mapaccess.GetAs[string](data, "friends[0].name")
+mapaccess.GetAs[int](data, "friends[0].age")
 ```
 
 ## Valid keys
