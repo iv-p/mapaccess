@@ -1,3 +1,3 @@
-module github.com/iv-p/mapaccess
+module github.com/theouteredge/mapaccess
 
 go 1.18
